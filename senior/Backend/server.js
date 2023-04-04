@@ -26,7 +26,7 @@ axios.get('https://api.aladhan.com/v1/hijriCalendarByAddress/1444/9?address=Tuni
       const newPrayer = new Prayer({
       city: apiData[i].meta.timezone,
       date: apiData[i].date.readable,
-      
+      gregorian : apiData[i].date.gregorian.date,
       Fajr :apiData[i].timings.Fajr ,
       Sunrise :apiData[i].timings.Sunrise ,
       Dhuhr : apiData[i].timings.Dhuhr,
@@ -47,7 +47,9 @@ axios.get('https://api.aladhan.com/v1/hijriCalendarByAddress/1444/9?address=Tuni
   app.get('/api/prayerTime', async (req, res) => {
  
     try {
-      const prayers = await Prayer.find()
+      const prayers = await Prayer.find().sort({date:1})
+        // Handle the results
+      
       res.json(prayers)
     } catch (err) {
       res.status(500).send(err)
@@ -60,8 +62,8 @@ app.get('/api/halalfood', async (req, res) => {
 
      axios.get('https://api.spoonacular.com/recipes/search', {
         params: {
-          query: 'chicken',
-          number: 10,
+          query: 'soups',
+          number: 25,
           apiKey: "7273c8a186c640e7a5e110216e0e2b69"
         }
 

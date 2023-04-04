@@ -4,13 +4,15 @@ const Schema = mongoose.Schema;
 const apiOneSchema = new mongoose.Schema({
   city: String,
   date: String,
-      Fajr: String,
+  gregorian: String ,
+  
+  Fajr: String,
       Sunrise : String,
       Dhuhr: String,
       Asr: String,
       Maghrib: String,
       Isha: String,
-      Imsak:String,
+      Imsak:String
 
   });
   
