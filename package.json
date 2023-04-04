@@ -1,0 +1,26 @@
+{
+  "name": "ramadhan",
+  "version": "1.0.0",
+  "description": "HalalApp\r This is a React app that provides the following features:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GREEN-FIELD-PROJECT-RAMADAN/Ramadhan.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GREEN-FIELD-PROJECT-RAMADAN/Ramadhan/issues"
+  },
+  "homepage": "https://github.com/GREEN-FIELD-PROJECT-RAMADAN/Ramadhan#readme",
+  "dependencies": {
+    "axios": "^1.3.4",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.3"
+  }
+}
