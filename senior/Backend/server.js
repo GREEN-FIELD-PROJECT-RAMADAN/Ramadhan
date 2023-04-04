@@ -58,16 +58,34 @@ axios.get('https://api.aladhan.com/v1/hijriCalendarByAddress/1444/9?address=Tuni
 // Halal food API
 app.get('/api/halalfood', async (req, res) => {
 
-     axios.get('https://api.spoonacular.com/recipes/search', {
-        params: {
-          query: 'chicken',
-          number: 10,
-          apiKey: "7273c8a186c640e7a5e110216e0e2b69"
-        }
-
-      }).then(response=>res.json(response.data) ).catch(err=>console.log(err));
-      res.status(200)
-    })
+        axios.get('https://api.spoonacular.com/recipes/search', {
+           params: {
+             query: 'pasta',
+             number: 10,
+             apiKey: "7273c8a186c640e7a5e110216e0e2b69"
+           }
+   
+         }).then(response => {
+       const recipes = response.data.results
+       recipes.forEach(data => {
+         const  recipe= new Recipes({
+           title: data.title,
+           image: data.image,
+           sourceName: data.sourceName,
+           sourceUrl: data.sourceUrl,
+           servings: data.servings,
+           readyInMinutes: data.readyInMinutes,
+           summary : data.summary
+         })
+         recipe.save()
+         .then(() => console.log('Data saved to database'))
+         .catch(error => console.log(error));
+     });
+     
+     res.status(200).send('Data saved to database');
+   
+       })
+     })
 
 
 // Hadith API
