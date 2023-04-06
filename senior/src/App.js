@@ -1,23 +1,72 @@
-import React, { useEffect, useState } from 'react'
-import Prayer from "./Components/Prayer";
-import axios from 'axios';
-const  App = ()=> {
+import React from 'react';
+import { Routes,Route } from 'react-router-dom';
+import Navbar from './component/Navbar';
+import Praylist from './component/Praylist';
+import Zaket from './component/Zaket';
+import Recipe from './component/Recipe';
+import Hadith from './component/Hadith';
+import Login from './component/Login';
+import { useState } from 'react';
+import Admin from './component/Admin';
 
-  const [prayer,setPrayer] = useState([]) 
 
+function App() {
 
-  useEffect(()=>{axios.get('http://localhost:3000/api/prayerTime')
-  .then(({data})=>
-  setPrayer(data))
-  .catch((err)=>console.log(err))},[])
+  const [isAuthenticated, setAuthenticated] = useState(false);
+  const [view,setView]=useState('login')
 
-  return (
-    <div className="App">
-     
-    <Prayer  prays={prayer} />
-
-    </div>
-  );
-}
-
-export default App;
+    return (
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <React.Fragment>
+              <Navbar/>
+              <div className="container mt-3 d-flex justify-content-center">
+              <Praylist />
+              </div>
+            </React.Fragment>
+          }
+        />
+        <Route
+          path="/Zaket"
+          element={
+            <React.Fragment>
+              <Navbar />
+              <Zaket />
+            </React.Fragment>
+          }
+        />
+       <Route
+          path="/hadith"
+          element={
+            <React.Fragment>
+              <Navbar />
+              <Hadith/>
+            </React.Fragment>
+          }
+        />
+        <Route
+          path="/recipe"
+          element={
+            <React.Fragment>
+              <Navbar />
+              <Recipe />
+            </React.Fragment>
+          }
+        />
+          <Route
+          path="/Login"
+          element={
+            <React.Fragment>
+              <Navbar />
+              {view==="login"&& <Login setView={setView}/>}
+              {view==="Admin" && <Admin />}
+            </React.Fragment>
+          }
+        />
+      </Routes>
+    );
+  }
+  
+  export default App
