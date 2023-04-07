@@ -17,10 +17,15 @@ const adminInfo = {
     password:password
 }
 // setInfo(adminInfo)
-axios.post('http://localhost:3005/ramadan/loginAdmin',adminInfo)
-.then(({data})=>{
-    
-if(data.status==='ok'){
+axios.defaults.withCredentials = true;
+
+axios.post('http://localhost:3005/ramadan/loginAdmin', adminInfo, {
+  headers: {
+    'Content-Type': 'application/json'
+  }
+}).then(({data})=>{
+    console.log(data);
+if(data==='Token sent in cookie'){
 
     console.log(data);
     Swal.fire({
@@ -52,6 +57,7 @@ else {
 
 })
 .catch((err)=>console.log(err))
+
 
 
 }

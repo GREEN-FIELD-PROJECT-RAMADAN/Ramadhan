@@ -12,7 +12,16 @@ const axios = require('axios');
 
 app.use(urlencoded({extended:true}))
 app.use(express.json())
-app.use(cors());
+
+app.use(cors({ origin: true, credentials: true, maxAge: 3600 }));
+
+// app.use(cors({
+//   origin: 'http://localhost:3000',
+//   credentials: true,
+//   maxAge: 600, 
+//   optionsSuccessStatus: 204,
+// }));
+
 
 mongoose.connect('mongodb://127.0.0.1:27017/ramadhan').then(()=>console.log('CONNECTED TO DB'))
 .catch(console.error)
@@ -36,31 +45,25 @@ app.post('/ramadan/registerAdmin', async (req, res) => {
   }
   })
   
-  app.post('/ramadan/loginAdmin',async (req,res)=>{
+  app.post('/ramadan/loginAdmin', async (req, res) => {
+    const admin = await Admin.findOne({
+      email: req.body.email,
+    });
   
-  const admin =  await Admin.findOne({
-      email:req.body.email,
-    })
-   
-   if(admin){
-    const isPasswordvalid = await bcrypt.compare(req.body.password, admin.password)
-    if (isPasswordvalid){
-      const token = jwt.sign(
-        {
-        email:admin.email
-      },'secret123'
-      )
-      return res.json({status:'ok',admin : token})
-     }
-     else {
-      return res.json({status:'error, verify password',admin:false})
-     }
+    if (admin) {
+      const isPasswordvalid = await bcrypt.compare(req.body.password, admin.password);
+      if (isPasswordvalid) {
+        const token = jwt.sign({ email: admin.email }, 'secret123');
+        res.cookie('jwt', token, { httpOnly: false, maxAge: 3600000 });
+        res.status(200).send('Token sent in cookie');
+      } else {
+        return res.json({ status: 'error, verify password', admin: false });
+      }
+    } else {
+      console.log('Email not found ');
+      return res.json({ status: 'error, verify email', admin: false });
     }
-    else {
-      res.status(500).json('Verify email')
-    }
-  
-  })
+  });
 
 
 
