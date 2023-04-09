@@ -13,7 +13,7 @@ const withAuth = (Component) => {
       }
     }, [cookies.jwt, navigate]);
 
-    return <Component {...props} token={cookies.token} />;
+    return <Component {...props}  />;
   };
 };
 

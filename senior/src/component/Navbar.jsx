@@ -3,18 +3,29 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom'
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import axios from 'axios';
+import Swal from "sweetalert2";
 const Navbar = () => {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
   const navigate = useNavigate();
 const handleLogOut = () =>{
 
-  removeCookie(cookies.jwt);
-  console.log(cookies.jwt);
-  // navigate("/login");
+ axios.get('http://localhost:3005/logout').then((response) => {
+  removeCookie("jwt");
+  Swal.fire({
+    icon: "success",
+    title: "Logged out successfully!",
+    showConfirmButton: false,
+    timer: 1500,
+  });
+}).catch((err)=>console.log(err))
 
 }
   return (
-    <div >
+    <div  >
+      {console.log(cookies)}
       <nav className="navbar navbar-expand-xxl navbar-light fixed-top bg-Secondary shadow-lg p-3 mb-5 .bg-transparent rounded">
         <div className="container-xxl">
           <Link className="btn btn-outline-dark" to="/Praylist">Ramadhan</Link>
@@ -50,7 +61,7 @@ const handleLogOut = () =>{
             </ul>
             {/* search input we may use */}
             <Link className="btn btn-outline-success" to="/login">Login as Admin</Link>
-            <Link className="btn btn-outline-success " onClick={handleLogOut} to="/Praylist">Log out</Link>
+            <Link className="btn btn-danger " onClick={handleLogOut} to="/Praylist">Log out</Link>
           </div>
         </div>
       </nav>

@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const bodyParser = require('body-parser');
 const {LocalStorage} = require('node-localstorage');
 const cors = require ('cors')
+const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs')
 const {Prayer,Hadith,Recipes,Admin} = require('./model.js')
 const { urlencoded } = require('express')
@@ -14,7 +15,14 @@ app.use(urlencoded({extended:true}))
 app.use(express.json())
 
 app.use(cors({ origin: true, credentials: true, maxAge: 3600 }));
+app.use(cookieParser());
 
+app.get('/getCookie', (req, res) => {
+  // get the cookie named "myCookie"
+  const myCookie = req.cookies.jwt;
+  console.log(req.cookies.jwt); 
+  res.send('Cookie received');
+});
 app.use(session({
   secret: 'secret123',
   resave: false,
@@ -26,25 +34,20 @@ app.use(session({
 mongoose.connect('mongodb://127.0.0.1:27017/ramadhan').then(()=>console.log('CONNECTED TO DB'))
 .catch(console.error)
 
-//Login admin 
-const localStorage = new LocalStorage('./scratch');
+// //Login admin 
+// const localStorage = new LocalStorage('./scratch');
 
-// app.get('/token', (req, res) => {
-//   const token = localStorage.getItem('token');
-//   if (token) {
-//     res.status(200).send({ token });
-//   } else {
-//     res.status(401).send({ error: 'Unauthorized' });
-//   }
-// });
-app.post('/ramadan/logoutAdmin', (req, res) => {
-  res.clearCookie('jwt');
-  res.json({
-    status: 'ok',
-    message: 'Successfully logged out',
-  });
+
+//Logout deletes the cookie
+app.get('/logout', (req, res) => {
+  
+  res.clearCookie('jwt', { path: '/' });
+  res.status(200).send('Logged out successfully');
 });
 
+//////////////
+
+// REgistering an admin in the back 
 app.post('/ramadan/registerAdmin', async (req, res) => {
 
   try{
@@ -61,6 +64,8 @@ app.post('/ramadan/registerAdmin', async (req, res) => {
   }
   })
   
+//Logging in and setting the cookie 
+
   app.post('/ramadan/loginAdmin', async (req, res) => {
     const admin = await Admin.findOne({
       email: req.body.email,
@@ -84,7 +89,7 @@ app.post('/ramadan/registerAdmin', async (req, res) => {
   });
 
 
-
+//Saving my prayers in the database
 app.post('/ramadhan/prayerTime', (req, res) => {
   axios.get('https://api.aladhan.com/v1/hijriCalendarByAddress/1444/9?address=Tunisia')
     .then(response => {
@@ -112,7 +117,7 @@ app.post('/ramadhan/prayerTime', (req, res) => {
     .catch(error =>
       console.error(error));
 })
-
+////Prayer time api
 app.get('/ramadhan/prayerTime', async (req, res) => {
 
   try {
