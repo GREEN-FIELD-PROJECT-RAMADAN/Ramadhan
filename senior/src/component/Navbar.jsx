@@ -1,15 +1,23 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom'
-
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 const Navbar = () => {
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const navigate = useNavigate();
+const handleLogOut = () =>{
 
+  removeCookie(cookies.jwt);
+  console.log(cookies.jwt);
+  // navigate("/login");
 
+}
   return (
-    <div> 
+    <div >
       <nav className="navbar navbar-expand-xxl navbar-light fixed-top bg-Secondary shadow-lg p-3 mb-5 .bg-transparent rounded">
         <div className="container-xxl">
-          <Link className="btn btn-outline-dark" to="/">Ramadhan</Link>
+          <Link className="btn btn-outline-dark" to="/Praylist">Ramadhan</Link>
           <button
             className="navbar-toggler"
             type="button"
@@ -35,11 +43,14 @@ const Navbar = () => {
               <li className="nav-item">
                 <Link className="btn btn-outline-secondary" to="/Hadith">Hadith</Link>
               </li>
+              {/* linkedd to Hadith root  */}
+              <li className="nav-item">
+                <Link className="btn btn-outline-secondary" to="/QiblaDirection">Qibla</Link>
+              </li>
             </ul>
             {/* search input we may use */}
-           
-              <Link className="btn btn-outline-success" to="/Login">Login as Admin</Link>
-            
+            <Link className="btn btn-outline-success" to="/login">Login as Admin</Link>
+            <Link className="btn btn-outline-success " onClick={handleLogOut} to="/Praylist">Log out</Link>
           </div>
         </div>
       </nav>

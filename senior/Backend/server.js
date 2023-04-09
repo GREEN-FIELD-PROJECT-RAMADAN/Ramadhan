@@ -2,32 +2,48 @@ const express = require('express')
 const mongoose = require ("mongoose")
 const jwt = require('jsonwebtoken')
 const bodyParser = require('body-parser');
-
+const {LocalStorage} = require('node-localstorage');
 const cors = require ('cors')
 const bcrypt = require('bcryptjs')
 const {Prayer,Hadith,Recipes,Admin} = require('./model.js')
 const { urlencoded } = require('express')
 const app = express()
 const axios = require('axios');
-
+const session = require('express-session');
 app.use(urlencoded({extended:true}))
 app.use(express.json())
 
 app.use(cors({ origin: true, credentials: true, maxAge: 3600 }));
 
-// app.use(cors({
-//   origin: 'http://localhost:3000',
-//   credentials: true,
-//   maxAge: 600, 
-//   optionsSuccessStatus: 204,
-// }));
+app.use(session({
+  secret: 'secret123',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 3600000 } // 1 hour
+}));
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/ramadhan').then(()=>console.log('CONNECTED TO DB'))
 .catch(console.error)
 
 //Login admin 
+const localStorage = new LocalStorage('./scratch');
 
+// app.get('/token', (req, res) => {
+//   const token = localStorage.getItem('token');
+//   if (token) {
+//     res.status(200).send({ token });
+//   } else {
+//     res.status(401).send({ error: 'Unauthorized' });
+//   }
+// });
+app.post('/ramadan/logoutAdmin', (req, res) => {
+  res.clearCookie('jwt');
+  res.json({
+    status: 'ok',
+    message: 'Successfully logged out',
+  });
+});
 
 app.post('/ramadan/registerAdmin', async (req, res) => {
 
@@ -55,6 +71,8 @@ app.post('/ramadan/registerAdmin', async (req, res) => {
       if (isPasswordvalid) {
         const token = jwt.sign({ email: admin.email }, 'secret123');
         res.cookie('jwt', token, { httpOnly: false, maxAge: 3600000 });
+        // req.session.token = token;
+        // localStorage.setItem('token',token);
         res.status(200).send('Token sent in cookie');
       } else {
         return res.json({ status: 'error, verify password', admin: false });

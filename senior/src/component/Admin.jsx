@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios';
-
+import withAuth from './withauth';
 const Admin = () => {
   const [hadiths, setHadiths] = useState([]);
   const [recipes, setRecipes] = useState([]);
 
   useEffect(() => {
+    
     axios.get('http://localhost:3005/ramadhan/admin/hadith')
       .then(res => setHadiths(res.data))
       .catch(err => console.log(err));
@@ -119,4 +120,4 @@ const Admin = () => {
 
 }
 
-export default Admin
+export default withAuth(Admin)

@@ -2,13 +2,20 @@ import React from 'react'
 import Swal from 'sweetalert2';
 import { useState } from 'react'
 import axios from 'axios';
-const Login = ({setView}) => {
+import { useNavigate } from 'react-router';
 
+
+const Login = ({setView}) => {
+  // const token = localStorage.getItem("token");
     const [email,setEmail]=useState('')
     const [password,setPassword]=useState('')
+   const navigate=useNavigate()
+   
    
     
-    
+
+
+
 const handleSubmit =e=>{
     e.preventDefault()
 console.log('hello');
@@ -19,26 +26,22 @@ const adminInfo = {
 // setInfo(adminInfo)
 axios.defaults.withCredentials = true;
 
-axios.post('http://localhost:3005/ramadan/loginAdmin', adminInfo, {
-  headers: {
-    'Content-Type': 'application/json'
-  }
-}).then(({data})=>{
-    console.log(data);
-if(data==='Token sent in cookie'){
+axios.post('http://localhost:3005/ramadan/loginAdmin', adminInfo)
+  .then(({data}) => {
+   
+    if (data === 'Token sent in cookie') {
+        
 
-    console.log(data);
-    Swal.fire({
+      
+      Swal.fire({
         icon: 'success',
         title: 'Successfully logged in!',
         showConfirmButton: false,
         timer: 2000,
       });
-    setView('Admin')
-}
-else {
-    
-    Swal.fire({
+      navigate('/admin');
+    } else {
+      Swal.fire({
         timer: 1500,
         showConfirmButton: false,
         willOpen: () => {
@@ -53,10 +56,11 @@ else {
           });
         },
       });
-}
-
-})
-.catch((err)=>console.log(err))
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
 
 
 
