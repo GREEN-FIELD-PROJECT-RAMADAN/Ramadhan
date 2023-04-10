@@ -3,7 +3,9 @@ import axios from 'axios';
 import withAuth from './withauth';
 import './Admin.css';
 import { Card, Col, Row, Modal, Button, Form } from 'react-bootstrap';
-
+import Swal from "sweetalert2";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 const Admin = () => {
   const [hadiths, setHadiths] = useState([]);
   const [toggle, setToggle] = useState({});
@@ -18,7 +20,22 @@ const Admin = () => {
     narrator: "",
     book: "",
   })
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const navigate = useNavigate();
+const handleLogOut = () =>{
 
+ axios.get('http://localhost:3005/logout').then((response) => {
+  removeCookie("jwt");
+  navigate("/Praylist");
+  Swal.fire({
+    icon: "success",
+    title: "Logged out successfully!",
+    showConfirmButton: false,
+    timer: 1500,
+  });
+}).catch((err)=>console.log(err))
+
+}
 
   const handleCloseSAved = () => {
     handleHadithSubmit()
@@ -102,7 +119,11 @@ const submitUpdate = (id)=>{
       <h2 className='text-center mb-4'>Hadiths</h2>
 
       {/* hadith card add and display */}
-
+      <div className="d-flex justify-content-end">
+      <Button variant="primary" className="btn btn-danger" onClick={handleLogOut}>
+        Logout
+      </Button>
+    </div>
       <Button variant="primary" onClick={handleShow}>
         Add hadith
       </Button>
@@ -151,8 +172,44 @@ const submitUpdate = (id)=>{
                 </div>
                 <div className="text-center">
                   <button type="button" className="btn btn-outline-danger" onClick={() => handleHadithDelete(hadith._id)}>Delete</button>
+                  {/* <button type="button" className="btn btn-outline-danger" onClick={()=>submitUpdate(hadith._id)}>Update</button> */}
                   {/* update hadith  */}
-                 
+                  <Button variant="primary" onClick={handleShow}>
+        Update
+      </Button>
+      <Modal show={showModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Update hadith</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}>
+          <Form >
+            <Form.Group controlId="hadith">
+              <Form.Label>Narrator</Form.Label>
+              <Form.Control type="text" placeholder="Enter narrator" onChange={e=>setNarrator(e.target.value)} />
+            </Form.Group>
+
+            <Form.Group controlId="narrator">
+              <Form.Label>Hadiths</Form.Label>
+              <Form.Control as="textarea" rows={3} placeholder="Enter hadiths" onChange={e=>setHadith(e.target.value)} />
+            </Form.Group>
+
+            <Form.Group controlId="book">
+              <Form.Label>Book</Form.Label>
+              <Form.Control type="text" placeholder="Enter book" name="book" onChange={e=>setBook(e.target.value)}  />
+            </Form.Group>
+
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+              <Button variant="primary" type="submit" onClick={()=>submitUpdate(hadith._id)}>
+                Save changes
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal.Body>
+      </Modal>
                 </div>
               </Card.Body>
             </Card>

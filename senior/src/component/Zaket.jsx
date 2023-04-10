@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const ZakatCalculator = () => {
   const [muslimZakat, setMuslimZakat] = useState(0);
+  const [lastValidZakat, setLastValidZakat] = useState(0);
   const [amount, setAmount] = useState(0);
 
   useEffect(() => {
@@ -12,17 +13,34 @@ const ZakatCalculator = () => {
     } else {
       const zakatAmount = muslimZakat * zakatRate;
       setAmount(parseFloat(zakatAmount));
+      setLastValidZakat(muslimZakat); 
     }
   }, [muslimZakat]);
 
+  const handleAmountChange = (e) => {
+    const inputValue = parseFloat(e.target.value);
+    if (isNaN(inputValue) || e.target.value === "") {
+      setMuslimZakat(0);
+    } else {
+      setMuslimZakat(inputValue);
+    }
+  };
+  
+
   return (
-    <div  >
+    <div>
       <div className="row justify-content-center align-items-center vh-100 ">
         <div className="col-md-4 shadow-none p-3 mb-5 ">
-          <h3>Entre Amount</h3>
+          <h3>Enter Amount</h3>
           <div className="input-group shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-          <span class="input-group-text ">TND</span>
-            <input type="text" className="form-control" id="amount" onChange={(e) => setMuslimZakat(parseFloat(e.target.value))} />
+            <span className="input-group-text ">TND</span>
+            <input
+              type="text"
+              className="form-control"
+              id="amount"
+              value={muslimZakat}
+              onChange={handleAmountChange}
+            />
           </div>
         </div>
         <div className="col-md-4">
@@ -31,8 +49,10 @@ const ZakatCalculator = () => {
               <h5 className="card-title shadow-lg p-3 mb-5">ZAKAT</h5>
               <table className="table">
                 <tbody>
-                <tr>
-                    <td><h6>WHAT I HAVE</h6></td>
+                  <tr>
+                    <td>
+                      <h6>WHAT I HAVE</h6>
+                    </td>
                     <td>{parseFloat(muslimZakat)}</td>
                   </tr>
                   <tr>

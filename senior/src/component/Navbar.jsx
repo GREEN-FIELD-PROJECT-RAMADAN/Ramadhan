@@ -61,8 +61,7 @@ const handleLogOut = () =>{
             </ul>
             {/* search input we may use */}
             <Link className="btn btn-outline-success" to="/admin">Admin</Link>
-            <Link className="btn btn-outline-success" to="/login">Login as Admin</Link>
-            <Link className="btn btn-danger " onClick={handleLogOut} to="/Praylist">Log out</Link>
+            {/* <Link className="btn btn-outline-success" to="/login">Login as Admin</Link> */}
           </div>
         </div>
       </nav>

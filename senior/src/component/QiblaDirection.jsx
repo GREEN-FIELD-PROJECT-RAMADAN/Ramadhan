@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {Qibla} from 'qibla'
+import { Qibla } from "qibla";
 import "./compass.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function QiblaDirection() {
   const [latitude, setLatitude] = useState(null);
@@ -26,18 +27,19 @@ function QiblaDirection() {
   };
 
   return (
-    <div className=" container item-centre">
+    <div className="container-sm text-center ">
       <div className="qibla-direction">
-        
         {latitude === null || longitude === null ? (
           <p>Fetching your location...</p>
         ) : (
           <>
-          
-            <div className="compass" style={compassStyle}>
-              <div className="needle"></div>
+            <div
+              className="compass bg-light shadow-lg rounded-circle mx-auto"
+              style={compassStyle}
+            >
+              <div className="needle bg-dark rounded-pill position-absolute top-0 start-50 translate-middle-x"></div>
             </div>
-            <p className="qibla-direction__text">
+            <p className="qibla-direction__text mt-3">
               The Qibla direction from your location is {qiblaDirection}{" "}
               degrees.
             </p>

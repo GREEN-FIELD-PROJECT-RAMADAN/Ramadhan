@@ -56,14 +56,16 @@ const App = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  const handleCategorySelect = (category) => {
-    axios
-      .get(`http://localhost:3005/ramadhan/halalfood?cuisine=${category}`)
-      .then((response) => {
-        setRecipes(response.data);
-      })
-      .catch((err) => console.log(err));
-  };
+
+  // const handleCategorySelect = (category) => {
+  //   axios
+  //     .get(`https://api.edamam.com/search?q=${category}&app_id=82e453da&app_key=3bb5d1a3b992f408b9003effd74c9c22`)
+  //     .then((response) => {
+  //       setRecipes(response.data);
+  //     })
+  //     .catch((err) => console.log(err));
+  // }
+  
 
   return (
     <div className="container py-5">
@@ -73,7 +75,7 @@ const App = () => {
       <Nav variant="pills" className="mb-5 justify-content-center">
         <Nav.Item>
           <Nav.Link
-            onClick={() => handleCategorySelect('Syrian')}
+            // onClick={() => handleCategorySelect('Syrian')}
             className="text-uppercase fw-bold"
           >
             Syrian
@@ -81,7 +83,7 @@ const App = () => {
         </Nav.Item>
         <Nav.Item>
           <Nav.Link
-            onClick={() => handleCategorySelect('Egyptian')}
+            // onClick={() => handleCategorySelect('Egyptian')}
             className="text-uppercase fw-bold"
           >
             Egyptian
@@ -89,7 +91,7 @@ const App = () => {
         </Nav.Item>
         <Nav.Item>
           <Nav.Link
-            onClick={() => handleCategorySelect('Tunisian')}
+            // onClick={() => handleCategorySelect('Tunisian')}
             className="text-uppercase fw-bold"
           >
             Tunisian
