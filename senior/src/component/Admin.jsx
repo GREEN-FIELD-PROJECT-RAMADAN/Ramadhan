@@ -1,123 +1,166 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import withAuth from './withauth';
+import './Admin.css';
+import { Card, Col, Row, Modal, Button, Form } from 'react-bootstrap';
+
 const Admin = () => {
   const [hadiths, setHadiths] = useState([]);
-  const [recipes, setRecipes] = useState([]);
+  const [toggle, setToggle] = useState({});
+  const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
+
+  const [hadith, setHadith] = useState('');
+  const [narrator, setNarrator] = useState('');
+  const [book, setBook] = useState('');
+  const [info, setInfo] = useState({
+    hadith : "",
+    narrator: "",
+    book: "",
+  })
+
+
+  const handleCloseSAved = () => {
+    handleHadithSubmit()
+    setShowModal(false)
+  }
+  const handleClose = () => {
+    setShowModal(false)
+  }
+  const handleCloseUpdated = () => {
     
+    setShowModal(false)
+  }
+  const handleShow = () => setShowModal(true);
+
+  //toggle for haddith //
+  const handleToggle = (hadith_id) => {
+    setToggle(prevToggle => ({ ...prevToggle, [hadith_id]: !prevToggle[hadith_id] }));
+  }
+  useEffect(() => {
     axios.get('http://localhost:3005/ramadhan/admin/hadith')
       .then(res => setHadiths(res.data))
       .catch(err => console.log(err));
-
-    axios.get('http://localhost:3005/ramadhan/admin/recipes')
-      .then(res => setRecipes(res.data))
-      .catch(err => console.log(err));
   }, []);
 
-
+  //add  haddith //
 
   const handleHadithSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.target);
+    const form = event.target;
+
+    const hadith = form.elements.hadith.value;
+    const narrator = form.elements.narrator.value;
+    const book = form.elements.book.value;
 
     axios.post('http://localhost:3005/ramadhan/admin/hadith', {
-      hadith: data.get('hadith'),
-      narrator: data.get('narrator'),
-      book: data.get('book')
+      hadith,
+      narrator,
+      book
     })
-      .then(res => setHadiths([...hadiths, res.data]))
-      .catch(err => console.log(err));
-  };
-
-  const handleRecipeSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.target);
-
-    axios.post('http://localhost:3005/ramadhan/admin/recipes', {
-      title: data.get('title'),
-      image: data.get('image'),
-      sourceName: data.get('sourceName'),
-      sourceUrl: data.get('sourceUrl'),
-      servings: data.get('servings'),
-      readyInMinutes: data.get('readyInMinutes'),
-      summary: data.get('summary')
-    })
-      .then(res => setRecipes([...recipes, res.data]))
+      .then(res => {
+        setHadiths([...hadiths, res.data]);
+        setShowModal(false);
+      })
       .catch(err => console.log(err));
   };
 
 
+  //delete  haddith//
 
   const handleHadithDelete = (id) => {
+
     axios.delete(`http://localhost:3005/ramadhan/admin/hadith/${id}`)
       .then(() => setHadiths(hadiths.filter(hadith => hadith._id !== id)))
       .catch(err => console.log(err));
   };
 
-  const handleRecipeDelete = (id) => {
-    axios.delete(`http://localhost:3005/ramadhan/admin/recipes/${id}`)
-      .then(() => setRecipes(recipes.filter(recipe => recipe._id !== id)))
-      .catch(err => console.log(err));
+const submitUpdate = (id)=>{
+
+  const info = {
+    hadith : hadith,
+    narrator: narrator,
+    book: book,
   };
-
-  return (
-    <div>
-
-      <ul>
-      </ul>
-      <h2>Hadiths</h2>
-      <ul>
-        <form className='container' onSubmit={handleHadithSubmit}>
-          <label>Hadith:</label>
-          <input name="hadith" />
-          <label>Narrator:</label>
-          <input name="narrator" />
-          <label>Book:</label>
-          <input name="book" />
-          <button type="submit">Add Hadith</button>
-        </form>
-        {hadiths.map(hadith => (
-          <div key={hadith._id} className='card justify-content-center align-items-center p-2 sm'>
-            <div className="card-body" key={hadith._id}>
-              <h5 className="card-title">{hadith.narrator}</h5>
-              <h6 className="card-text mb-2 text-body-secondary">{hadith.hadith}</h6>
-              <p className="card-text">{hadith.book}</p>
-              <button type="button" className="btn btn-outline-danger" onClick={() => handleHadithDelete(hadith._id)}>Delete</button>
-              <button type="button" className="btn btn-outline-warning">update</button>
-            </div>
-          </div>))}
-      </ul>
-      {/* <h2>Recipes</h2>
-      <ul>
-        {recipes.map(recipe => (
-          <li key={recipe._id}>
-            {recipe.title} - {recipe.image} - {recipe.sourceName} - {recipe.sourceUrl} - {recipe.servings} - {recipe.readyInMinutes} - {recipe.summary}
-            <button onClick={() => handleRecipeDelete(recipe._id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-      <form onSubmit={handleRecipeSubmit}>
-        <label>Title:</label>
-        <input name="title" />
-        <label>Image:</label>
-        <input name="image" />
-        <label>Source Name:</label>
-        <input name="sourceName" />
-        <label>Source URL:</label>
-        <input name="sourceUrl" />
-        <label>Servings:</label>
-        <input name="servings" />
-        <label>Ready in Minutes:</label>
-        <input name="readyInMinutes" />
-        <label>Summary:</label>
-        <input name="summary" />
-        <button type="submit">Add Recipe</button>
-      </form> */}
-    </div>
-  )
-
+  setInfo(info)
+  axios.put(`http://localhost:3005/ramadhan/admin/hadith/${id}`,info)
+  .then((response)=>setInfo(response.data))
+  .catch((error)=>{console.log(error)})
 }
 
-export default withAuth(Admin)
+  const handleHadithUpdate = (id) => {
+    axios.put(`http://localhost:3005/ramadhan/admin/hadith/${id}`)
+      .then(({ hadith }) => {
+
+        setHadiths(hadiths.filter(hadith => hadith._id !== id))
+      })
+      .catch((err) => console.log(err))
+  }
+
+  return (
+    <div className='container my-4'>
+      <h2 className='text-center mb-4'>Hadiths</h2>
+
+      {/* hadith card add and display */}
+
+      <Button variant="primary" onClick={handleShow}>
+        Add hadith
+      </Button>
+      <Modal show={showModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add Hadith</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}>
+          <Form onSubmit={handleHadithSubmit}>
+            <Form.Group controlId="hadith">
+              <Form.Label>Narrator</Form.Label>
+              <Form.Control type="text" placeholder="Enter narrator" name="hadith" required />
+            </Form.Group>
+
+            <Form.Group controlId="narrator">
+              <Form.Label>Hadiths</Form.Label>
+              <Form.Control as="textarea" rows={3} placeholder="Enter hadiths" name="narrator" required />
+            </Form.Group>
+
+            <Form.Group controlId="book">
+              <Form.Label>Book</Form.Label>
+              <Form.Control type="text" placeholder="Enter book" name="book" required />
+            </Form.Group>
+
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+              <Button variant="primary" type="submit">
+                Save changes
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal.Body>
+      </Modal>
+      <Row className="gx-4 gx-md-5">
+        {hadiths.map(hadith => (
+          <Col lg={4} md={6} className="my-3" key={hadith._id}>
+            <Card className="h-100 border-0 shadow-sm">
+              <Card.Body className="d-flex flex-column justify-content-between">
+                <div>
+                  <Card.Title className="text-center" onClick={() => handleToggle(hadith._id)}>{hadith.narrator}</Card.Title>
+                  {toggle[hadith._id] ? <h6 className="card-text mb-2 text-body-secondary">{hadith.hadith}</h6> : null}
+                  <p className="card-text">{hadith.book}</p>
+                </div>
+                <div className="text-center">
+                  <button type="button" className="btn btn-outline-danger" onClick={() => handleHadithDelete(hadith._id)}>Delete</button>
+                  {/* update hadith  */}
+                 
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </div>
+  )
+}
+
+export default withAuth(Admin);

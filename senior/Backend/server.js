@@ -20,7 +20,7 @@ app.use(cookieParser());
 app.get('/getCookie', (req, res) => {
   // get the cookie named "myCookie"
   const myCookie = req.cookies.jwt;
-  console.log(req.cookies.jwt); 
+  console.log(req.cookies); 
   res.send('Cookie received');
 });
 app.use(session({
@@ -130,18 +130,44 @@ app.get('/ramadhan/prayerTime', async (req, res) => {
 
 
 // Halal food API
+app.post('/ramadhan/halalfood', async (req, res) => {
+  try {
+    const response = await axios.get('https://api.spoonacular.com/recipes/complexSearch', {
+      params: {
+        cuisines: ['Tunisian', 'Egyptian', 'Syrian'],
+        diet: 'halal',
+        number: 90,
+        apiKey: '7273c8a186c640e7a5e110216e0e2b69'
+      }
+    });
+    
+    const recipes = response.data.results.map(recipe => {
+      return {
+        title: recipe.title,
+        image: recipe.image,
+        sourceName: recipe.sourceName,
+        sourceUrl: recipe.sourceUrl,
+        servings: recipe.servings,
+        readyInMinutes: recipe.readyInMinutes,
+        summary: recipe.summary
+      }
+    });
+
+    await Recipes.insertMany(recipes);
+    res.status(200).json('Recipes saved successfully!');
+  } catch (error) {
+    console.error(error);
+    res.status(500).json('Internal server error!');
+  }
+});
 app.get('/ramadhan/halalfood', async (req, res) => {
-
-  axios.get('https://api.spoonacular.com/recipes/search', {
-    params: {
-      query: 'chicken',
-      number: 10,
-      apiKey: "7273c8a186c640e7a5e110216e0e2b69"
-    }
-
-  }).then(response => res.json(response.data)).catch(err => console.log(err));
-  res.status(200)
-})
+  try {
+    const prayers = await Recipes.find();
+    res.status(200).json(prayers);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
 
 
 // Hadith API after save
