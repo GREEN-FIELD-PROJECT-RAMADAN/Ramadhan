@@ -6,7 +6,7 @@ const {LocalStorage} = require('node-localstorage');
 const cors = require ('cors')
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs')
-const {Prayer,Hadith,Recipes,Admin} = require('./model.js')
+const {Prayer,Hadith,Recipe,Admin} = require('./model.js')
 const { urlencoded } = require('express')
 const app = express()
 const axios = require('axios');
@@ -127,42 +127,25 @@ app.get('/ramadhan/prayerTime', async (req, res) => {
     res.status(500).send(err)
   }
 })
+const YOUR_APP_ID = `db1ea14d`;
+const YOUR_APP_KEY = "9074d19a5d63068ab2213276583f70d4";
 
-
-// Halal food API
-app.post('/ramadhan/halalfood', async (req, res) => {
+app.get('/recipes', async (req, res) => {
   try {
-    const response = await axios.get('https://api.spoonacular.com/recipes/complexSearch', {
-      params: {
-        cuisines: ['Tunisian', 'Egyptian', 'Syrian'],
-        diet: 'halal',
-        number: 90,
-        apiKey: '7273c8a186c640e7a5e110216e0e2b69'
-      }
-    });
-    
-    const recipes = response.data.results.map(recipe => {
-      return {
-        title: recipe.title,
-        image: recipe.image,
-        sourceName: recipe.sourceName,
-        sourceUrl: recipe.sourceUrl,
-        servings: recipe.servings,
-        readyInMinutes: recipe.readyInMinutes,
-        summary: recipe.summary
-      }
-    });
+    const uri = `https://api.edamam.com/search?q=&app_id=${YOUR_APP_ID}&app_key=${YOUR_APP_KEY}&calories=500-700&from=0&to=100`;
+    const recipeData = await axios.get(uri);
 
-    await Recipes.insertMany(recipes);
-    res.status(200).json('Recipes saved successfully!');
+    await Recipe.insertMany(recipeData.data.hits.map(hit => hit.recipe));
+    res.status(200).json({ message: 'Recipes saved successfully!', data: recipeData.data.hits });
   } catch (error) {
     console.error(error);
-    res.status(500).json('Internal server error!');
+    res.status(500).json({ message: 'Internal server error!', error: error.message });
   }
 });
-app.get('/ramadhan/halalfood', async (req, res) => {
+
+app.get('/ramadhan/recipe', async (req, res) => {
   try {
-    const prayers = await Recipes.find();
+    const prayers = await Recipe.find();
     res.status(200).json(prayers);
   } catch (err) {
     res.status(500).send(err);
@@ -296,7 +279,7 @@ app.delete('/ramadhan/admin/hadith/:id', async (req, res) => {
 // Create
 app.post('/ramadhan/admin/recipes', async (req, res) => {
   try {
-    const newRecipe = new Recipes(req.body);
+    const newRecipe = new Recipe(req.body);
     await newRecipe.save();
     res.status(201).json(newRecipe);
   } catch (err) {
@@ -306,7 +289,7 @@ app.post('/ramadhan/admin/recipes', async (req, res) => {
 // Read
 app.get('/ramadhan/admin/recipes', async (req, res) => {
   try {
-    const recipes = await Recipes.find();
+    const recipes = await Recipe.find();
     res.status(200).json(recipes);
   } catch (err) {
     res.status(500).send(err);
@@ -315,7 +298,7 @@ app.get('/ramadhan/admin/recipes', async (req, res) => {
 // Update
 app.put('/ramadhan/admin/recipes/:id', async (req, res) => {
   try {
-    const recipe = await Recipes.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const recipe = await Recipe.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.status(200).json(recipe);
   } catch (err) {
     res.status(500).send(err);
@@ -324,7 +307,7 @@ app.put('/ramadhan/admin/recipes/:id', async (req, res) => {
 // Delete
 app.delete('/ramadhan/admin/recipes/:id', async (req, res) => {
   try {
-    await Recipes.findByIdAndDelete(req.params.id);
+    await Recipe.findByIdAndDelete(req.params.id);
     res.status(204).send('Deleted');
   } catch (err) {
     res.status(500).send(err);

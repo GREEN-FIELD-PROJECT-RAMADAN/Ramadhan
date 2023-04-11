@@ -41,20 +41,58 @@ const apiOneSchema = new mongoose.Schema({
   });
 
 
-  const ApiThreeSchema = new mongoose.Schema({
-    title: String,
-    image: String,
-    sourceName: String,
-    sourceUrl: String,
-    servings: Number,
-    readyInMinutes: Number,
-    summary : String
+  
 
-
+  const recipeSchema = new mongoose.Schema({
+    label: {
+      type: String,
+      required: true
+    },
+    image: {
+      type: String,
+      required: true
+    },
+    url: {
+      type: String,
+      required: true
+    },
+    yield: {
+      type: Number,
+      required: true
+    },
+    ingredientLines: {
+      type: [String],
+      required: true
+    },
+    cuisineType: {
+      type: [String],
+      required: true
+    },
+    totalTime: {
+      type: Number,
+      required: true
+    },
+    calories: {
+      type: Number,
+      required: true
+    },
+    source: {
+      type: String,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
   });
+  
+  const Recipe = mongoose.model('Recipe', recipeSchema);
+  
+  
+  
 
 const Prayer = mongoose.model('ApiOne', apiOneSchema);
 const Hadith = mongoose.model('ApiTwo', apiTwoSchema);
-const Recipes = mongoose.model('ApiThree', ApiThreeSchema);
+
 const Admin = mongoose.model('Admin',adminSchema)
-module.exports={Prayer,Hadith,Recipes,Admin};
+module.exports={Prayer,Hadith,Recipe,Admin};
